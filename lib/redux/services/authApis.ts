@@ -1,8 +1,9 @@
-import { baseApi } from './baseApi';
+import { baseApi } from "./baseApi";
 
 // User type - authSlice এর সাথে match করে
 export interface User {
   id: string;
+  _id?: string;
   name: string;
   email: string;
   role: string;
@@ -39,48 +40,52 @@ export const authApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     login: builder.mutation<AuthResponse, LoginCredentials>({
       query: (credentials) => ({
-        url: '/auth/login',
-        method: 'POST',
+        url: "/auth/login",
+        method: "POST",
         body: credentials,
       }),
-      invalidatesTags: ['Auth'],
+      invalidatesTags: ["Auth"],
     }),
-    
+
     register: builder.mutation<AuthResponse, RegisterData>({
       query: (userData) => ({
-        url: '/auth/register',
-        method: 'POST',
+        url: "/auth/register",
+        method: "POST",
         body: userData,
       }),
-      invalidatesTags: ['Auth'],
+      invalidatesTags: ["Auth"],
     }),
-    
+
     getCurrentUser: builder.query<User, void>({
-      query: () => '/auth/me',
-      providesTags: ['User'],
+      query: () => "/auth/me",
+      providesTags: ["User"],
     }),
-    
-    logout: builder.mutation<void, void>({
-      query: () => ({
-        url: '/auth/logout',
-        method: 'POST',
+    logout: builder.mutation({
+      query: (data: { refreshToken: string; }) => ({
+        url: "/auth/logout",
+        method: "POST",
+        body: {
+          refreshToken: data.refreshToken,
+        },
       }),
-      invalidatesTags: ['Auth'],
     }),
-    
+
     updateProfile: builder.mutation<User, Partial<User>>({
       query: (userData) => ({
-        url: '/auth/profile',
-        method: 'PUT',
+        url: "/auth/profile",
+        method: "PUT",
         body: userData,
       }),
-      invalidatesTags: ['User'],
+      invalidatesTags: ["User"],
     }),
-    
-    changePassword: builder.mutation<void, { oldPassword: string; newPassword: string }>({
+
+    changePassword: builder.mutation<
+      void,
+      { oldPassword: string; newPassword: string }
+    >({
       query: (body) => ({
-        url: '/auth/change-password',
-        method: 'POST',
+        url: "/auth/change-password",
+        method: "POST",
         body,
       }),
     }),

@@ -7,7 +7,7 @@ const layout = ({ children }: { children: React.ReactNode }) => {
     <div className="flex flex-col h-screen ">
       {" "}
       <Navbar />
-      <main className="w-full flex-1 max-w-350 mx-auto flex flex-col border border-red-500">{children}</main>
+      <main className="w-full flex-1 max-w-350 mx-auto flex flex-col">{children}</main>
       <div>
         <MobileMenu/>
       </div>
