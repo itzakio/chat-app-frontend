@@ -1,30 +1,53 @@
-import { useAppSelector } from "@/lib/redux/hooks";
-import { selectCurrentUser, selectIsAuthenticated, selectAuthLoading } from "@/lib/redux/slices/authSlice";
+"use client";
+
+import { useAppSelector, useAppDispatch } from "@/lib/redux/hooks";
+import {
+  selectCurrentUser,
+  selectIsAuthenticated,
+  selectAccessToken,
+  selectRefreshToken,
+  setCredentials,
+} from "@/lib/redux/slices/authSlice";
+import { useGetCurrentUserQuery } from "@/lib/redux/services/authApis";
 
 export const useUser = () => {
+  const dispatch = useAppDispatch();
+
   const user = useAppSelector(selectCurrentUser);
   const isAuthenticated = useAppSelector(selectIsAuthenticated);
-  const isLoading = useAppSelector(selectAuthLoading);
-  
+  const accessToken = useAppSelector(selectAccessToken);
+  const refreshToken = useAppSelector(selectRefreshToken);
+
+  // Fetch user from API if authenticated but no user in Redux
+  const { data: fetchedUser, isLoading: isFetchingUser } =
+    useGetCurrentUserQuery(undefined, {
+      skip: !isAuthenticated || !!user,
+    });
+
+  // Update Redux when user is fetched
+  if (fetchedUser && accessToken && refreshToken && !user) {
+    queueMicrotask(() => {
+      dispatch(
+        setCredentials({
+          user: fetchedUser,
+          accessToken,
+          refreshToken,
+        }),
+      );
+    });
+  }
+
+  const currentUser = fetchedUser || user;
+
   return {
-    // Full user object
-    user,
-    
-    // User basic info (shortcuts)
-    id: user?.id,
-    name: user?.name,
-    email: user?.email,
-    role: user?.role,
-    isEmailVerified: user?.isEmailVerified,
-    lastLogin: user?.lastLogin,
-    
-    // Auth status
+    user: currentUser,
+    id: currentUser?.id,
+    name: currentUser?.name,
+    email: currentUser?.email,
+    role: currentUser?.role,
+    isEmailVerified: currentUser?.isEmailVerified,
     isAuthenticated,
-    isLoading,
-    
-    // Helper boolean flags
-    isAdmin: user?.role === 'admin',
-    isRegularUser: user?.role === 'user',
-    hasVerifiedEmail: user?.isEmailVerified === true,
+    isLoading: isFetchingUser,
+    isAdmin: currentUser?.role === "admin",
   };
 };

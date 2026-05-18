@@ -45,7 +45,7 @@ const MobileMenu = () => {
     }, [activeIndex]);
 
     return (
-        <div className='fixed bottom-0 left-0 right-0 z-50 pb-2 bg-linear-to-t from-(--background) to-transparent'>
+        <div className=' pb-2 bg-linear-to-t from-(--background) to-transparent'>
             <div className='px-4 pb-4 flex justify-center max-w-350 mx-auto'>
                 <div ref={containerRef} className='relative w-full h-14 rounded-full flex justify-around items-center bg-white/50 dark:bg-white/10 backdrop-blur-md shadow-lg'>
                     {/* Sliding Indicator - No padding in className, handle in style */}
